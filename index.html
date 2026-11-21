@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f7f4" />
+    <meta name="description" content="Report local issues, follow their progress, and help make your neighbourhood better with CivicResolve." />
+      <title>CivicResolve — Your neighbourhood, better.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="evidence.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="app.js" defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="CivicResolve home">
+          <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 28 9.5v13L16 29 4 22.5v-13L16 3Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 16.3 14.2 20 22 11.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="brand-name">civic<span>resolve</span></span>
+        </a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link active" data-view="overview"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span>Overview</button>
+          <button class="nav-link" data-view="issues"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5 21 20H3L12 3.5Z"/><path d="M12 9v4.5M12 17h.01"/></svg></span>All reports<span class="nav-count" id="report-count">0</span></button>
+          <button class="nav-link" data-view="drafts"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M5 3.5h10l4 4V21H5V3.5Z"/><path d="M15 3.5V8h4M8 12h8M8 16h6"/></svg></span>Saved drafts<span class="nav-count hidden" id="draft-count">0</span></button>
+          <button class="nav-link" data-view="map"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 6.5 8.5 4l7 2.5L21 4v13.5l-5.5 2.5-7-2.5L3 20V6.5Z"/><path d="M8.5 4v13.5M15.5 6.5V20"/></svg></span>Issue map</button>
+          <button class="nav-link" data-view="notifications"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg></span>Notifications<span class="nav-count hidden" id="notification-nav-count">0</span></button>
+          <button class="nav-link" data-view="intelligence"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 20V10m5 10V4m5 16v-7m5 7V7"/><path d="m3 7 5-4 5 6 7-5"/></svg></span>Civic Intelligence</button>
+          <button class="nav-link" data-view="admin"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5.5c0 4.5-2.9 7.6-7 9.5-4.1-1.9-7-5-7-9.5V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg></span>Admin review</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="impact-card">
+            <div class="impact-icon"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></div>
+            <p class="impact-title">Small reports.<br />Big neighbourhood energy.</p>
+            <p class="impact-copy">Every report helps make our community a little better.</p>
+            <div class="impact-decoration"></div>
+          </div>
+          <div class="profile">
+            <div class="avatar">CR</div><div class="profile-copy"><strong>Community member</strong><span>Neighbourhood resident</span></div>
+            <button class="more-button" aria-label="Profile options">···</button>
+          </div>
+        </div>
+        <div class="modal-backdrop hidden" id="authority-application-modal" role="dialog" aria-modal="true" aria-labelledby="authority-application-title">
+          <div class="auth-modal">
+            <div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>OFFICIAL AUTHORITY REQUEST</p><h2 id="authority-application-title">Apply for authority access</h2><p class="modal-subtitle">Access remains locked until a verified Super Admin approves it.</p></div><button class="close-button" id="authority-application-close" aria-label="Close authority application">×</button></div>
+            <form id="authority-application-form">
+              <label class="field-label" for="authority-requested-role">Authority role <span>*</span></label><select id="authority-requested-role" class="form-control" required><option value="">Select role</option><option value="DEPARTMENT_MEMBER">Department Member</option><option value="DEPARTMENT_HEAD">Department Head</option></select>
+              <label class="field-label" for="authority-department">Verified department <span>*</span></label><select id="authority-department" class="form-control" required><option value="">Loading departments...</option></select>
+              <label class="field-label" for="authority-employee-id">Official employee ID <span>*</span></label><input id="authority-employee-id" class="form-control" maxlength="100" required placeholder="Government employee ID" />
+              <label class="field-label" for="authority-designation">Official designation <span>*</span></label><input id="authority-designation" class="form-control" maxlength="160" required placeholder="Job title or designation" />
+              <label class="field-label" for="authority-verification-note">Verification details <span>*</span></label><textarea id="authority-verification-note" class="form-control textarea" maxlength="500" required placeholder="Provide only facts a Super Admin can verify"></textarea>
+              <div class="form-error hidden" id="authority-application-error" role="alert"></div>
+              <div class="modal-actions"><span class="privacy-note">Your request is reviewed by a Super Admin.</span><button class="button button-primary" type="submit">Submit verification request</button></div>
+            </form>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong id="breadcrumb-current">Overview</strong></div>
+          <div class="top-actions">
+            <span class="location-chip"><svg viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg>Brooklyn, NY <span class="location-dot"></span></span>
+            <button class="notification-button" id="notification-button" aria-label="Open notifications" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg><span class="notification-count hidden" id="notification-count">0</span></button>
+            <button class="top-avatar" id="top-avatar" aria-label="Your profile">CR</button>
+          </div>
+          <div class="notification-panel hidden" id="notification-panel"><div class="notification-heading"><strong>Notifications</strong><button id="notification-close" type="button" aria-label="Close notifications">×</button></div><div id="notification-list"><div class="notification-empty">Sign in to view notifications.</div></div></div>
+        </header>
+
+        <section class="page-content" id="overview-view">
+          <div class="welcome-row">
+            <div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR COMMUNITY, IN THE LOOP</p><h1>Good morning, neighbour<span class="heading-period">.</span></h1><p class="page-subtitle">A better block starts with a heads-up. Here's what's happening around you.</p></div>
+            <button class="button button-primary" id="report-open"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Report an issue</button>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card stat-total"><div class="stat-top"><span class="stat-label">Community reports</span><span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 4.5h14v15H5z"/><path d="M8.5 9h7M8.5 13h7M8.5 16.5h4"/></svg></span></div><div class="stat-number" id="stat-total">0</div><div class="stat-foot"><span class="stat-note">Issues surfaced by neighbours</span></div><div class="stat-spark spark-green"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+            <article class="stat-card"><div class="stat-top"><span class="stat-label">In progress</span><span class="stat-icon icon-lime"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg></span></div><div class="stat-number" id="stat-progress">0</div><div class="stat-foot"><span class="status-pip pip-yellow"></span><span class="stat-note">Being worked on right now</span></div><div class="stat-spark spark-yellow"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+            <article class="stat-card"><div class="stat-top"><span class="stat-label">Resolved</span><span class="stat-icon icon-mint"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4L19 7"/></svg></span></div><div class="stat-number" id="stat-resolved">0</div><div class="stat-foot"><span class="status-pip pip-green"></span><span class="stat-note">Good things getting done</span></div><div class="stat-spark spark-mint"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel reports-panel">
+              <div class="panel-heading"><div><p class="eyebrow panel-eyebrow">THE NEIGHBOURHOOD PULSE</p><h2>Recent reports</h2></div><button class="text-button" data-navigate="issues">See all reports <span>↗</span></button></div>
+              <div class="report-list" id="recent-reports"></div>
+              <div class="empty-state" id="recent-empty"><span class="empty-illustration"><svg viewBox="0 0 48 48"><path d="M9 35h30M13 35V19l11-8 11 8v16M20 35V25h8v10M7 19l17-12 17 12"/></svg></span><strong>Your neighbourhood board is clear.</strong><span>Be the first to report an issue and get the conversation started.</span><button class="text-button" data-open-report>Share a heads-up <span>↗</span></button></div>
+            </section>
+
+            <aside class="right-column">
+              <section class="panel status-panel">
+                <div class="panel-heading"><div><p class="eyebrow panel-eyebrow">A LITTLE PROGRESS</p><h2>Resolution status</h2></div><span class="live-badge"><i></i> LIVE</span></div>
+                <div class="status-summary"><div class="donut-wrap"><div class="donut" id="status-donut"><div class="donut-center"><strong id="resolved-percent">0%</strong><span>resolved</span></div></div></div><div class="status-legend"><div><span class="legend-dot legend-resolved"></span><span>Resolved</span><strong id="legend-resolved">0</strong></div><div><span class="legend-dot legend-progress"></span><span>In progress</span><strong id="legend-progress">0</strong></div><div><span class="legend-dot legend-reported"></span><span>Reported</span><strong id="legend-reported">0</strong></div></div></div>
+                <div class="status-message"><span class="message-spark">✳</span><span id="status-message">Every resolved issue makes a real difference.</span></div>
+              </section>
+              <section class="neighborhood-card"><div class="neighborhood-top"><div><span class="eyebrow light-eyebrow">YOUR CIVIC SIDEKICK</span><h2>Not sure where<br />to start?</h2></div><span class="sparkle-mark">✳</span></div><p>Tell us what you spotted. We'll help figure out who can fix it.</p><button class="button button-light" data-open-report>Let's report it <span>↗</span></button><span class="card-orbit orbit-one"></span><span class="card-orbit orbit-two"></span></section>
+            </aside>
+          </div>
+
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> CivicResolve helps your voice find the right ears.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="issues-view">
+          <div class="welcome-row compact-welcome"><div><p class="eyebrow"><span class="eyebrow-line"></span>THE NEIGHBOURHOOD PULSE</p><h1>All reports<span class="heading-period">.</span></h1><p class="page-subtitle">Every heads-up from the community, all in one place.</p></div><button class="button button-primary" data-open-report><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Report an issue</button></div>
+          <div class="filter-row"><div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg><input id="issue-search" type="search" placeholder="Search reports..." aria-label="Search reports" /></div><select id="status-filter" aria-label="Filter by status"><option value="all">All statuses</option><option value="Reported">Reported</option><option value="In Progress">In progress</option><option value="Resolved">Resolved</option></select><select id="category-filter" aria-label="Filter by category"><option value="all">All categories</option><option>Roads &amp; sidewalks</option><option>Waste management</option><option>Street lighting</option><option>Water &amp; drainage</option><option>Public spaces</option><option>Other</option></select></div>
+          <div class="panel all-reports-panel"><div class="table-wrap"><table><thead><tr><th>ISSUE</th><th>LOCATION</th><th>CATEGORY</th><th>PRIORITY</th><th>STATUS</th><th>REPORTED</th></tr></thead><tbody id="all-reports-body"></tbody></table></div><div class="empty-state" id="all-empty"><span class="empty-illustration"><svg viewBox="0 0 48 48"><path d="M9 35h30M13 35V19l11-8 11 8v16M20 35V25h8v10M7 19l17-12 17 12"/></svg></span><strong>No reports match just yet.</strong><span>Try a different search or be the first to report an issue.</span><button class="text-button" data-open-report>Report an issue <span>↗</span></button></div></div>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> CivicResolve helps your voice find the right ears.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="drafts-view">
+          <div class="welcome-row compact-welcome"><div><p class="eyebrow"><span class="eyebrow-line"></span>WORK OFFLINE, SUBMIT WITH CONFIDENCE</p><h1>Saved drafts<span class="heading-period">.</span></h1><p class="page-subtitle">Drafts stay on this device until you review and submit them.</p></div><div class="connectivity-status" id="connectivity-status"><span></span><strong>Checking connection</strong></div></div>
+          <div class="panel drafts-panel"><div id="draft-list" class="draft-list"><div class="notification-empty">Loading drafts...</div></div></div>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> Nothing is submitted until the server confirms it.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="map-view">
+          <div class="welcome-row compact-welcome">
+            <div><p class="eyebrow"><span class="eyebrow-line"></span>ISSUES ON THE GROUND</p><h1>Community map<span class="heading-period">.</span></h1><p class="page-subtitle">Explore reported issues and their current status across the neighbourhood.</p></div>
+            <button class="button button-primary" id="map-locate"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>My location</button>
+          </div>
+          <div class="map-toolbar">
+            <select id="map-level-filter" aria-label="Filter by governance level"><option value="all">All governance levels</option><option value="LOCAL">Local</option><option value="STATE">State</option><option value="NATIONAL">National</option></select>
+            <select id="map-category-filter" aria-label="Filter by category"><option value="all">All categories</option><option>Roads &amp; sidewalks</option><option>Waste management</option><option>Street lighting</option><option>Water &amp; drainage</option><option>Public spaces</option><option>Other</option></select>
+            <select id="map-status-filter" aria-label="Filter by status"><option value="all">All statuses</option><option>Reported</option><option>In Progress</option><option>Resolved</option><option>Awaiting Admin Verification</option></select>
+            <select id="map-priority-filter" aria-label="Filter by priority"><option value="all">All priorities</option><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
+          </div>
+          <div class="panel map-panel">
+            <div id="civic-map" aria-label="Map showing civic issues"></div>
+            <div class="map-empty hidden" id="map-empty"><strong>No mapped reports in this view.</strong><span>Try another filter or capture a location for a new report.</span></div>
+          </div>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> Map markers show only public complaint location and status.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="intelligence-view">
+          <div class="welcome-row compact-welcome"><div><p class="eyebrow"><span class="eyebrow-line"></span>AI-POWERED GOVERNANCE INSIGHTS</p><h1>Civic Intelligence<span class="heading-period">.</span></h1><p class="page-subtitle">Verified complaint statistics and advisory AI interpretations.</p></div><button class="button button-primary" id="intelligence-refresh" type="button">Refresh analysis</button></div>
+          <div class="intelligence-toolbar">
+            <select id="intelligence-range" aria-label="Analysis date range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 3 months</option><option value="180">Last 6 months</option><option value="365">Last 1 year</option></select>
+            <select id="intelligence-governance" aria-label="Governance level"><option value="ALL">All governance levels</option><option value="LOCAL">Local</option><option value="STATE">State</option><option value="NATIONAL">National</option></select>
+            <select id="intelligence-department" aria-label="Department"><option value="ALL">All departments</option></select>
+          </div>
+          <div class="intelligence-kpis">
+            <article><span>Total complaints</span><strong id="intel-total">0</strong></article>
+            <article><span>Unresolved</span><strong id="intel-unresolved">0</strong></article>
+            <article><span>Resolved</span><strong id="intel-resolved">0</strong></article>
+            <article><span>Overdue</span><strong id="intel-overdue">0</strong></article>
+            <article><span>Reopened</span><strong id="intel-reopened">0</strong></article>
+            <article><span>Avg. resolution</span><strong id="intel-average">0d</strong></article>
+          </div>
+          <div class="intelligence-grid">
+            <section class="panel intelligence-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">VERIFIED STATISTICS</p><h2>Category concentration</h2></div></div><div id="intel-categories" class="bar-chart"><div class="notification-empty">Loading analysis...</div></div></section>
+            <section class="panel intelligence-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">VERIFIED STATISTICS</p><h2>Department workload</h2></div></div><div id="intel-departments" class="intelligence-list"><div class="notification-empty">Loading workload...</div></div></section>
+            <section class="panel intelligence-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">UNRESOLVED LOCATIONS</p><h2>Priority hotspots</h2></div></div><div id="intel-hotspots" class="intelligence-list"><div class="notification-empty">Loading hotspots...</div></div></section>
+            <section class="panel intelligence-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">EXPERIMENTAL PREDICTIONS</p><h2>Potential trends</h2></div></div><div id="intel-predictions" class="intelligence-list"><div class="notification-empty">Loading predictions...</div></div></section>
+          </div>
+          <section class="panel ai-insights-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">ADVISORY AI INTERPRETATION</p><h2>Gemini civic insights</h2></div><span class="live-badge" id="intel-ai-status">AI STATUS</span></div><div id="intel-ai-insights"><div class="notification-empty">Gemini analysis will appear here when configured and sufficient data is available.</div></div></section>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> Statistics are verified; AI interpretations are advisory.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="notifications-view">
+          <div class="welcome-row compact-welcome"><div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR CIVIC UPDATES</p><h1>Notifications<span class="heading-period">.</span></h1><p class="page-subtitle">Stay informed about complaint progress and important authority updates.</p></div><button class="button button-primary" id="mark-all-read" type="button">Mark all as read</button></div>
+          <div class="notification-toolbar"><select id="notification-filter" aria-label="Filter notifications"><option value="ALL">All</option><option value="UNREAD">Unread</option><option value="READ">Read</option></select><select id="notification-governance-filter" aria-label="Filter by governance"><option value="ALL">All governance levels</option><option value="LOCAL">Local</option><option value="STATE">State</option><option value="NATIONAL">National</option></select><select id="notification-priority-filter" aria-label="Filter by priority"><option value="ALL">All priorities</option><option value="URGENT">Urgent</option><option value="IMPORTANT">Important</option><option value="NORMAL">Normal</option></select></div>
+          <div class="notification-page-layout"><section class="panel notification-page-panel"><div id="notification-page-list"><div class="notification-empty">Loading notifications...</div></div></section><aside class="panel notification-settings-panel"><div class="panel-heading"><div><p class="eyebrow panel-eyebrow">YOUR PREFERENCES</p><h2>Notification settings</h2></div></div><div class="notification-preference-list">
+            <label><span>Status updates</span><input id="pref-statusUpdates" type="checkbox" checked /></label>
+            <label><span>Department assignments</span><input id="pref-assignmentUpdates" type="checkbox" checked /></label>
+            <label><span>Progress and evidence</span><input id="pref-progressUpdates" type="checkbox" checked /></label>
+            <label><span>Deadline reminders</span><input id="pref-deadlineReminders" type="checkbox" checked /></label>
+            <label><span>Escalation alerts</span><input id="pref-escalationAlerts" type="checkbox" checked /></label>
+            <label><span>Email notifications</span><input id="pref-emailEnabled" type="checkbox" /></label>
+            <label><span>Push notifications</span><input id="pref-pushEnabled" type="checkbox" /></label>
+          </div><button class="button button-primary notification-save" id="save-notification-preferences" type="button">Save preferences</button></aside></div>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> Notifications contain only authorized complaint updates.</span></footer>
+        </section>
+
+        <section class="page-content secondary-view hidden" id="admin-view">
+          <div class="welcome-row compact-welcome"><div><p class="eyebrow"><span class="eyebrow-line"></span>FOR THE PEOPLE WHO KEEP US GOING</p><h1>Admin review<span class="heading-period">.</span></h1><p class="page-subtitle">Review community reports and help move issues forward.</p></div></div>
+          <section class="panel authority-verification-panel hidden" id="authority-verification-panel">
+            <div class="panel-heading"><div><p class="eyebrow panel-eyebrow">VERIFIED AUTHORITY ACCESS</p><h2>Pending authority applications</h2></div><button class="text-button" id="refresh-authority-applications" type="button">Refresh</button></div>
+            <div id="authority-applications-list" class="authority-applications-list"><div class="notification-empty">No pending applications.</div></div>
+          </section>
+          <div class="admin-note"><span class="admin-note-icon">✳</span><span><strong>Admin mode</strong> — Update a report's status to keep neighbours in the loop. Changes are saved on this device.</span></div>
+          <div class="form-error hidden" id="admin-error" role="alert"></div>
+          <div class="admin-kpis" id="admin-kpis" style="display:grid;grid-template-columns:repeat(6,minmax(100px,1fr));gap:8px;margin-bottom:16px">
+            <article><span>National</span><strong id="kpi-national">0</strong></article>
+            <article><span>State</span><strong id="kpi-state">0</strong></article>
+            <article><span>Local</span><strong id="kpi-local">0</strong></article>
+            <article><span>Awaiting AI verification</span><strong id="kpi-verification">0</strong></article>
+            <article><span>In progress</span><strong id="kpi-progress">0</strong></article>
+            <article><span>Resolved</span><strong id="kpi-resolved">0</strong></article>
+            <article><span>Feedback average</span><strong id="kpi-feedback-average">0</strong></article>
+            <article><span>Problem unresolved</span><strong id="kpi-feedback-unresolved">0</strong></article>
+            <article><span>Reopening requests</span><strong id="kpi-reopening">0</strong></article>
+          </div>
+          <div class="panel all-reports-panel"><div class="table-wrap"><table><thead><tr><th>ISSUE</th><th>LOCATION</th><th>DEPARTMENT</th><th>PRIORITY</th><th>STATUS</th><th>UPDATE STATUS</th></tr></thead><tbody id="admin-reports-body"></tbody></table></div><div class="empty-state" id="admin-empty"><span class="empty-illustration"><svg viewBox="0 0 48 48"><path d="M9 35h30M13 35V19l11-8 11 8v16M20 35V25h8v10M7 19l17-12 17 12"/></svg></span><strong>All caught up.</strong><span>New community reports will show up here.</span></div></div>
+          <footer class="page-footer"><span>Made for neighbours, by neighbours.</span><span><span class="footer-dot"></span> CivicResolve helps your voice find the right ears.</span></footer>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop hidden" id="report-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="report-modal">
+        <div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>HELP US MAKE IT BETTER</p><h2 id="modal-title">What's happening?</h2><p class="modal-subtitle">A few details go a long way. Your neighbours thank you.</p></div><button class="close-button" id="modal-close" aria-label="Close dialog">×</button></div>
+        <form id="report-form">
+          <label class="field-label" for="issue-title">Give it a short title <span>*</span></label><input id="issue-title" name="title" class="form-control" maxlength="90" placeholder="e.g. Pothole on Maple Street" required />
+          <label class="field-label" for="issue-description">Tell us a little more <span>*</span></label><textarea id="issue-description" name="description" class="form-control textarea" maxlength="1200" placeholder="What did you notice? Add any details that might help..." required></textarea><div class="field-hint">A clear description helps us get this to the right team.</div>
+          <section class="voice-recorder" aria-labelledby="voice-recorder-title">
+            <div class="voice-recorder-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>SPEAK YOUR REPORT</p><h3 id="voice-recorder-title">Register Complaint Using Voice</h3></div>
+              <label class="voice-language" for="voice-language">Language
+                <select id="voice-language" aria-label="Voice recognition language"><option value="en-IN">English</option></select>
+              </label>
+            </div>
+            <div class="voice-recording-status" id="voice-recording-status"><span class="voice-status-dot"></span><span id="voice-status-text">Ready to record</span></div>
+            <div class="voice-controls">
+              <button class="voice-mic-button" id="voice-start" type="button" aria-label="Start voice recording"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg><span>Start Recording</span></button>
+              <button class="voice-control-button" id="voice-stop" type="button" disabled>Stop Recording</button>
+              <button class="voice-control-button" id="voice-pause" type="button" disabled>Pause</button>
+              <button class="voice-control-button" id="voice-resume" type="button" disabled>Resume</button>
+              <button class="voice-control-button" id="voice-clear" type="button">Clear Recording</button>
+            </div>
+            <div class="voice-transcript-wrap">
+              <div class="voice-transcript-heading"><label for="voice-transcript">Recognized words</label><button class="text-button" id="voice-edit" type="button">Edit Generated Text</button></div>
+              <div id="voice-transcript-live" class="voice-transcript-live" aria-live="polite">Your spoken words will appear here.</div>
+              <textarea id="voice-transcript" class="voice-transcript-editor hidden" maxlength="1200" placeholder="Recognition text can be edited here"></textarea>
+            </div>
+            <div class="voice-actions"><span id="voice-error" class="voice-error hidden" role="alert"></span><button class="button button-primary" id="voice-use-text" type="button" disabled>Use this text in complaint <span>↗</span></button></div>
+          </section>
+          <div class="form-two-col"><div><label class="field-label" for="issue-location">Where is it? <span>*</span></label><div class="input-with-icon"><svg viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></svg><input id="issue-location" name="location" class="form-control" maxlength="120" placeholder="Street or neighbourhood" required /></div></div><div class="ai-location-note"><label class="field-label">AI jurisdiction</label><div class="jurisdiction-readonly"><span>✳</span><div><strong>Automatically detected</strong><small>Governance & department determined by Gemini</small></div></div></div></div>
+          <section class="problem-location-picker" aria-labelledby="problem-location-title">
+            <div class="picker-heading"><div><p class="eyebrow"><span class="eyebrow-line"></span>EXACT POSITION</p><h3 id="problem-location-title">Pinpoint Problem Location on Map</h3></div><button class="location-capture-button" id="location-capture" type="button"><svg viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="4"/></svg><span id="location-capture-label">Use My Current Location</span></button></div>
+            <div class="location-search-row"><div class="input-with-icon location-search-input"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg><input id="location-search" class="form-control" type="search" placeholder="Search place, street, area or landmark" autocomplete="off" aria-label="Search problem location" /></div><button class="button location-search-button" id="location-search-button" type="button">Search</button></div>
+            <div class="location-status hidden" id="location-status" role="status"></div>
+            <div id="problem-location-map" class="problem-location-map" aria-label="Interactive problem location map"></div>
+            <div class="location-details">
+              <div><span>LATITUDE</span><strong id="selected-latitude">Not selected</strong></div>
+              <div><span>LONGITUDE</span><strong id="selected-longitude">Not selected</strong></div>
+              <div class="address-detail"><span>DETECTED ADDRESS</span><strong id="selected-address">Search or select a point on the map</strong></div>
+              <button class="text-button" id="clear-location" type="button">Clear / change</button>
+            </div>
+          </section>
+          <label class="field-label upload-label" for="issue-image">Add a photo <span class="optional">(optional)</span></label><label class="upload-box" for="issue-image"><input id="issue-image" type="file" accept="image/*" /><span class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4M7.5 8.5 12 4l4.5 4.5M5 14v5h14v-5"/></svg></span><span class="upload-copy"><strong>Choose a photo</strong><span id="upload-caption">or drag and drop here · JPG, PNG up to 5 MB</span></span><span class="upload-preview hidden" id="upload-preview"></span></label>
+          <div class="ai-note"><span class="ai-note-icon">✳</span><span><strong>Smart routing, built in.</strong> We'll identify the issue, urgency, and the right department automatically.</span><span class="ai-indicator"><i></i> AI READY</span></div>
+          <div class="analysis-card hidden" id="analysis-card"><div class="analysis-heading"><span class="analysis-check">✓</span><div><strong>Here's what we found</strong><span id="analysis-engine">AI-powered report analysis</span></div></div><div class="analysis-results"><div><span>ISSUE TYPE</span><strong id="analysis-category">—</strong></div><div><span>GOVERNANCE</span><strong id="analysis-governance">—</strong></div><div><span>PRIORITY</span><strong id="analysis-priority">—</strong></div><div><span>ROUTED TO</span><strong id="analysis-department">—</strong></div><div><span>JURISDICTION</span><strong id="analysis-jurisdiction">—</strong></div><div><span>PUBLIC IMPACT</span><strong id="analysis-impact">—</strong></div></div><div class="analysis-reason"><strong>Why this route?</strong><span id="analysis-reason">—</span></div></div>
+          <div class="duplicate-card hidden" id="duplicate-card"><div class="duplicate-heading"><span>Possible existing complaint</span><strong id="duplicate-count">0 matches</strong></div><div id="duplicate-list"></div></div>
+          <div class="form-error hidden" id="form-error" role="alert"></div>
+          <div class="modal-actions"><span class="privacy-note"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Shared with your local team</span><div class="modal-submit-actions"><button class="button draft-save-button" id="save-draft-button" type="button">Save draft</button><button class="button button-primary submit-button" id="submit-button" type="submit">Review my report <span>↗</span></button></div></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-backdrop hidden" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div class="auth-modal">
+        <div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>SECURE COMMUNITY ACCESS</p><h2 id="auth-title">Sign in to CivicResolve</h2><p class="modal-subtitle">Use your authorized CivicResolve account.</p></div><button class="close-button" id="auth-close" aria-label="Close dialog">×</button></div>
+        <form id="auth-form">
+          <label class="field-label" id="auth-name-label" for="auth-name">Display name</label><input id="auth-name" class="form-control hidden" maxlength="100" autocomplete="name" />
+          <label class="field-label" for="auth-email">Email address</label><input id="auth-email" type="email" class="form-control" maxlength="254" autocomplete="email" required />
+          <label class="field-label" for="auth-password">Password</label><input id="auth-password" type="password" class="form-control" minlength="8" autocomplete="current-password" required />
+          <div class="form-error hidden" id="auth-error" role="alert"></div>
+          <button class="button button-primary auth-submit" id="auth-submit" type="submit">Sign in <span>↗</span></button>
+          <button class="auth-switch text-button" id="auth-switch" type="button">New here? Create a citizen account</button>
+        </form>
+      </div>
+    </div>
+    <div class="toast hidden" id="toast" role="status"><span class="toast-check">✓</span><div><strong>Report received!</strong><span>Your neighbours and local team are in the loop.</span></div><button id="toast-close" aria-label="Dismiss">×</button></div>
+    <div class="modal-backdrop hidden" id="evidence-modal" role="dialog" aria-modal="true" aria-label="Evidence photo">
+      <div class="evidence-modal-card"><button class="close-button" id="evidence-close" aria-label="Close evidence photo">×</button><img id="evidence-modal-image" alt="Resolution evidence" /></div>
+    </div>
+    <div class="modal-backdrop hidden" id="duplicate-detail-modal" role="dialog" aria-modal="true" aria-labelledby="duplicate-detail-title">
+      <div class="auth-modal"><div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>EXISTING COMPLAINT</p><h2 id="duplicate-detail-title">Public status</h2></div><button class="close-button" id="duplicate-detail-close" aria-label="Close duplicate status">×</button></div><div id="duplicate-detail-content" class="duplicate-detail-content"></div></div>
+    </div>
+    <div class="modal-backdrop hidden" id="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <div class="auth-modal feedback-modal-card">
+        <div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>SHARE YOUR EXPERIENCE</p><h2 id="feedback-title">Resolution feedback</h2><p class="modal-subtitle" id="feedback-complaint-title"></p></div><button class="close-button" id="feedback-close" aria-label="Close feedback form">×</button></div>
+        <form id="feedback-form">
+          <input type="hidden" id="feedback-complaint-id" />
+          <fieldset class="feedback-rating"><legend>How satisfied are you with the resolution?</legend><div class="feedback-stars" id="feedback-stars"><button type="button" data-rating="1" aria-label="1 star">★</button><button type="button" data-rating="2" aria-label="2 stars">★</button><button type="button" data-rating="3" aria-label="3 stars">★</button><button type="button" data-rating="4" aria-label="4 stars">★</button><button type="button" data-rating="5" aria-label="5 stars">★</button></div><input type="hidden" id="feedback-rating" value="0" /></fieldset>
+          <fieldset class="feedback-resolved"><legend>Has the original problem been fixed?</legend><label><input type="radio" name="problem-resolved" value="yes" required /> Yes, it is resolved</label><label><input type="radio" name="problem-resolved" value="no" /> No, the problem still exists</label></fieldset>
+          <label class="field-label" for="feedback-comments">Tell us more <span class="optional">(optional)</span></label><textarea id="feedback-comments" class="form-control textarea" maxlength="1200" placeholder="Share your experience or describe what still needs attention"></textarea>
+          <div class="form-error hidden" id="feedback-error" role="alert"></div>
+          <div class="modal-actions"><span class="privacy-note"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Your feedback cannot be deleted</span><button class="button button-primary" type="submit">Submit feedback <span>↗</span></button></div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-backdrop hidden" id="reopen-modal" role="dialog" aria-modal="true" aria-labelledby="reopen-title">
+      <div class="auth-modal">
+        <div class="modal-top"><div><p class="eyebrow"><span class="eyebrow-line"></span>PROBLEM STILL EXISTS</p><h2 id="reopen-title">Request reopening</h2><p class="modal-subtitle" id="reopen-complaint-title"></p></div><button class="close-button" id="reopen-close" aria-label="Close reopening form">×</button></div>
+        <form id="reopen-form"><input type="hidden" id="reopen-complaint-id" /><label class="field-label" for="reopen-reason">Why should this complaint be reopened? <span>*</span></label><textarea id="reopen-reason" class="form-control textarea" maxlength="1200" required placeholder="Explain what remains unresolved or has returned"></textarea><div class="form-error hidden" id="reopen-error" role="alert"></div><div class="modal-actions"><span class="privacy-note">A Super Admin will review this request.</span><button class="button button-primary" type="submit">Request reopening <span>↗</span></button></div></form>
+      </div>
+    </div>
+  </body>
+</html>

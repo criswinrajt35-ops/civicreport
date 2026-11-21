@@ -1,0 +1,122 @@
+[
+  {
+    "id": "IN-NHAI-001",
+    "name": "National Highways Authority of India",
+    "governanceLevel": "NATIONAL",
+    "state": null,
+    "district": null,
+    "localBody": null,
+    "departmentHead": "NHAI Project Director",
+    "employees": []
+  },
+  {
+    "id": "IN-RAIL-001",
+    "name": "Indian Railways",
+    "governanceLevel": "NATIONAL",
+    "state": null,
+    "district": null,
+    "localBody": null,
+    "departmentHead": "Divisional Railway Manager",
+    "employees": []
+  },
+  {
+    "id": "TN-SHW-001",
+    "name": "Tamil Nadu State Highways Department",
+    "governanceLevel": "STATE",
+    "state": "Tamil Nadu",
+    "district": null,
+    "localBody": null,
+    "departmentHead": "Chief Engineer, Highways",
+    "employees": []
+  },
+  {
+    "id": "TN-HOSP-001",
+    "name": "Tamil Nadu Health Department",
+    "governanceLevel": "STATE",
+    "state": "Tamil Nadu",
+    "district": null,
+    "localBody": null,
+    "departmentHead": "Director of Public Health",
+    "employees": []
+  },
+  {
+    "id": "TN-TPR-WATER-001",
+    "name": "Water Supply Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Tiruppur",
+    "localBody": "Tiruppur Municipality",
+    "departmentHead": "Municipal Commissioner",
+    "employees": []
+  },
+  {
+    "id": "TN-TPR-SAN-001",
+    "name": "Sanitation Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Tiruppur",
+    "localBody": "Tiruppur Municipality",
+    "departmentHead": "Sanitation Officer",
+    "employees": []
+  },
+  {
+    "id": "TN-TPR-LIGHT-001",
+    "name": "Municipal Lighting Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Tiruppur",
+    "localBody": "Tiruppur Municipality",
+    "departmentHead": "Municipal Engineer",
+    "employees": []
+  },
+  {
+    "id": "TN-TPR-ROAD-001",
+    "name": "Road Maintenance Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Tiruppur",
+    "localBody": "Tiruppur Municipality",
+    "departmentHead": "Municipal Engineer",
+    "employees": []
+  },
+  {
+    "id": "TN-TPR-DRAIN-001",
+    "name": "Drainage Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Tiruppur",
+    "localBody": "Tiruppur Municipality",
+    "departmentHead": "Municipal Engineer",
+    "employees": []
+  },
+  {
+    "id": "TN-CBE-WATER-001",
+    "name": "Water Supply Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "localBody": "Coimbatore Municipal Corporation",
+    "departmentHead": "Corporation Commissioner",
+    "employees": []
+  },
+  {
+    "id": "TN-CBE-SAN-001",
+    "name": "Sanitation Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "localBody": "Coimbatore Municipal Corporation",
+    "departmentHead": "Sanitation Officer",
+    "employees": []
+  },
+  {
+    "id": "TN-CBE-LIGHT-001",
+    "name": "Municipal Lighting Department",
+    "governanceLevel": "LOCAL",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "localBody": "Coimbatore Municipal Corporation",
+    "departmentHead": "Corporation Engineer",
+    "employees": []
+  }
+]

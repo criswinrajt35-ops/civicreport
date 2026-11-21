@@ -1,0 +1,16 @@
+{
+  "name": "civicresolve",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A civic issue reporting and management prototype.",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed-departments.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
